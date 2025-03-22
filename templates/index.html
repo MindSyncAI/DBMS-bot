@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBMS Chatbot Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1abc9c;
+            --secondary-color: #2ecc71;
+            --gradient-start: #1abc9c;
+            --gradient-mid: #16a085;
+            --gradient-end: #2ecc71;
+            --bot-message-bg: rgba(255, 255, 255, 0.9);
+            --user-message-bg: linear-gradient(135deg, #1abc9c, #16a085, #2ecc71);
+            --text-color: #263238;
+            --secondary-text-color: #546e7a;
+            --bg-color: #f5f7fa;
+            --chat-bg: rgba(255, 255, 255, 0.7);
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(26, 188, 156, 0.2);
+            --header-bg: rgba(255, 255, 255, 0.9);
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --chip-bg: rgba(255, 255, 255, 0.9);
+            --chip-hover-bg: rgba(26, 188, 156, 0.2);
+            --network-dots: rgba(26, 188, 156, 0.7);
+            --network-lines: rgba(26, 188, 156, 0.3);
+            --glow-primary: rgba(26, 188, 156, 0.7);
+            --glow-secondary: rgba(46, 204, 113, 0.7);
+            --grid-lines: rgba(46, 204, 113, 0.2);
+        }
+
+        .dark-mode {
+            --primary-color: #1abc9c;
+            --secondary-color: #2ecc71;
+            --gradient-start: #1abc9c;
+            --gradient-mid: #16a085;
+            --gradient-end: #2ecc71;
+            --bot-message-bg: rgba(30, 45, 40, 0.9);
+            --user-message-bg: linear-gradient(135deg, #0e6655, #0b5345, #186a3b);
+            --text-color: #eceff1;
+            --secondary-text-color: #b0bec5;
+            --bg-color: #121212;
+            --chat-bg: rgba(20, 35, 30, 0.7);
+            --border-color: #2c3e50;
+            --shadow-color: rgba(26, 188, 156, 0.3);
+            --header-bg: rgba(30, 45, 40, 0.9);
+            --input-bg: rgba(30, 45, 40, 0.9);
+            --chip-bg: rgba(30, 45, 40, 0.9);
+            --chip-hover-bg: rgba(26, 188, 156, 0.3);
+            --network-dots: rgba(46, 204, 113, 0.7);
+            --network-lines: rgba(46, 204, 113, 0.3);
+            --glow-primary: rgba(26, 188, 156, 0.8);
+            --glow-secondary: rgba(46, 204, 113, 0.8);
+            --grid-lines: rgba(46, 204, 113, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+            opacity: 0.2;
+            z-index: -2;
+        }
+
+        .background-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .glow-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--glow-secondary) 0%, transparent 70%);
+            opacity: 0.6;
+            filter: blur(10px);
+            animation: moveCircle 30s linear infinite;
+        }
+
+        @keyframes moveCircle {
+            0% {
+                transform: translate(calc(100vw * var(--random-x-start)), calc(100vh * var(--random-y-start))) scale(var(--random-scale-start));
+                opacity: var(--random-opacity-start);
+            }
+            25% {
+                transform: translate(calc(100vw * var(--random-x-mid1)), calc(100vh * var(--random-y-mid1))) scale(var(--random-scale-mid));
+                opacity: var(--random-opacity-mid);
+            }
+            50% {
+                transform: translate(calc(100vw * var(--random-x-mid2)), calc(100vh * var(--random-y-mid2))) scale(var(--random-scale-mid));
+                opacity: var(--random-opacity-start);
+            }
+            75% {
+                transform: translate(calc(100vw * var(--random-x-mid3)), calc(100vh * var(--random-y-mid3))) scale(var(--random-scale-mid));
+                opacity: var(--random-opacity-mid);
+            }
+            100% {
+                transform: translate(calc(100vw * var(--random-x-end)), calc(100vh * var(--random-y-end))) scale(var(--random-scale-end));
+                opacity: var(--random-opacity-end);
+            }
+        }
+
+        .binary-stream {
+            position: absolute;
+            font-family: monospace;
+            font-size: 10px;
+            color: var(--network-lines);
+            z-index: -1;
+            animation: fallBinary 10s linear infinite;
+        }
+
+        @keyframes fallBinary {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        .pulse-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid var(--glow-secondary);
+            box-shadow: 0 0 20px var(--glow-secondary);
+            animation: pulseRing 4s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes pulseRing {
+            0% {
+                width: 30px;
+                height: 30px;
+                opacity: 0.8;
+            }
+            100% {
+                width: 300px;
+                height: 300px;
+                opacity: 0;
+            }
+        }
+
+        .grid-line {
+            position: absolute;
+            background: var(--grid-lines);
+            z-index: -1;
+        }
+
+        .grid-line.horizontal {
+            height: 1px;
+            width: 100%;
+            animation: fadeInOut 8s infinite;
+        }
+
+        .grid-line.vertical {
+            width: 1px;
+            height: 100%;
+            animation: fadeInOut 8s infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .database-icon {
+            position: absolute;
+            opacity: 0.6;
+            filter: drop-shadow(0 0 5px var(--glow-primary));
+            animation: floatIcon 15s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            max-height: 800px;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 700px;
+            height: 100%;
+            max-height: 800px;
+            display: flex;
+            flex-direction: column;
+            background: var(--chat-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        .chat-icon i {
+            color: white;
+            font-size: 18px;
+        }
+
+        .chat-title h1 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .chat-title p {
+            font-size: 12px;
+            color: var(--secondary-text-color);
+        }
+
+        .chat-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 15px;
+            border-radius: 15px;
+            line-height: 1.5;
+            font-size: 14px;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background: var(--bot-message-bg);
+            border-top-left-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: var(--user-message-bg);
+            color: white;
+            border-top-right-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--bot-message-bg);
+            border-radius: 15px;
+            border-top-left-radius: 5px;
+            width: fit-content;
+            margin-top: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: typingBounce 1.2s infinite;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        .chat-input-container {
+            padding: 15px 20px;
+            background: var(--header-bg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chip-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .chip-container::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .chip-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .chip {
+            padding: 8px 15px;
+            background: var(--chip-bg);
+            border-radius: 20px;
+            font-size: 12px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .chip:hover {
+            background: var(--chip-hover-bg);
+        }
+
+        .input-group {
+            display: flex;
+            position: relative;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: none;
+            background: var(--input-bg);
+            border-radius: 25px;
+            padding: 12px 45px 12px 15px;
+            font-size: 14px;
+            color: var(--text-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 15px;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .input-icon:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Scrollbar styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .chat-container {
+                max-height: calc(100vh - 20px);
+            }
+
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation" id="backgroundAnimation"></div>
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <div class="chat-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="chat-title">
+                        <h1>DBMS Assistant</h1>
+                        <p>Database Management Systems</p>
+                    </div>
+                </div>
+                <div class="chat-controls">
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    Hello! I'm your DBMS Assistant. Ask me anything about Database Management Systems!
+                </div>
+                <div class="message user-message">
+                    What's the difference between SQL and NoSQL databases?
+                </div>
+                <div class="message bot-message">
+                    Great question! SQL (Structured Query Language) databases are relational databases with structured schemas, tables, and use SQL for manipulating data. Examples include MySQL, PostgreSQL, and Oracle.
+                    
+                    NoSQL databases are non-relational and offer more flexibility with less strict schemas. They're designed for specific data models and scale horizontally more easily. Types include document stores (MongoDB), key-value stores (Redis), wide-column stores (Cassandra), and graph databases (Neo4j).
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <div class="chip-container">
+                    <div class="chip">SQL Queries</div>
+                    <div class="chip">Normalization</div>
+                    <div class="chip">Indexing</div>
+                    <div class="chip">Transactions</div>
+                    <div class="chip">Data Models</div>
+                    <div class="chip">Database Design</div>
+                </div>
+                <div class="input-group">
+                    <input type="text" class="chat-input" placeholder="Type your message here..." id="messageInput">
+                    <i class="fas fa-paper-plane input-icon" id="sendButton"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+
+        // Create background elements
+        function createBackgroundElements() {
+            const backgroundAnimation = document.getElementById('backgroundAnimation');
+            
+            // Create grid lines (table-like structure)
+            for (let i = 0; i < 10; i++) {
+                // Horizontal lines
+                const hLine = document.createElement('div');
+                hLine.className = 'grid-line horizontal';
+                hLine.style.top = `${(i + 1) * 10}vh`;
+                hLine.style.animationDelay = `${i * 0.5}s`;
+                backgroundAnimation.appendChild(hLine);
+                
+                // Vertical lines
+                const vLine = document.createElement('div');
+                vLine.className = 'grid-line vertical';
+                vLine.style.left = `${(i + 1) * 10}vw`;
+                vLine.style.animationDelay = `${i * 0.5}s`;
+                backgroundAnimation.appendChild(vLine);
+            }
+            
+            // Create glowing circles
+            for (let i = 0; i < 15; i++) {
+                // Create main glow circle
+                const glowCircle = document.createElement('div');
+                glowCircle.className = 'glow-circle';
+                
+                // Random size between 50px and 200px
+                const size = 50 + Math.random() * 150;
+                glowCircle.style.width = `${size}px`;
+                glowCircle.style.height = `${size}px`;
+                
+                // Set random starting and ending positions
+                glowCircle.style.setProperty('--random-x-start', Math.random());
+                glowCircle.style.setProperty('--random-y-start', Math.random());
+                glowCircle.style.setProperty('--random-x-mid1', Math.random());
+                glowCircle.style.setProperty('--random-y-mid1', Math.random());
+                glowCircle.style.setProperty('--random-x-mid2', Math.random());
+                glowCircle.style.setProperty('--random-y-mid2', Math.random());
+                glowCircle.style.setProperty('--random-x-mid3', Math.random());
+                glowCircle.style.setProperty('--random-y-mid3', Math.random());
+                glowCircle.style.setProperty('--random-x-end', Math.random());
+                glowCircle.style.setProperty('--random-y-end', Math.random());
+                
+                // Set random scale transitions
+                glowCircle.style.setProperty('--random-scale-start', 0.8 + Math.random() * 0.5);
+                glowCircle.style.setProperty('--random-scale-mid', 0.7 + Math.random() * 0.6);
+                glowCircle.style.setProperty('--random-scale-end', 0.8 + Math.random() * 0.5);
+                
+                // Set random opacity transitions
+                glowCircle.style.setProperty('--random-opacity-start', 0.4 + Math.random() * 0.4);
+                glowCircle.style.setProperty('--random-opacity-mid', 0.3 + Math.random() * 0.4);
+                glowCircle.style.setProperty('--random-opacity-end', 0.4 + Math.random() * 0.4);
+                
+                // Set random animation duration
+                const duration = 20 + Math.random() * 30;
+                glowCircle.style.animationDuration = `${duration}s`;
+                glowCircle.style.animationDelay = `${Math.random() * 10}s`;
+                
+                // Alternate between primary and secondary colors
+                if (i % 2 === 0) {
+                    glowCircle.style.background = `radial-gradient(circle, var(--glow-primary) 0%, transparent 70%)`;
+                } else {
+                    glowCircle.style.background = `radial-gradient(circle, var(--glow-secondary) 0%, transparent 70%)`;
+                }
+                
+                backgroundAnimation.appendChild(glowCircle);
+            }
+            
+            // Create database icons
+            const dbIcons = [
+                '<i class="fas fa-database" style="font-size: 24px; color: var(--primary-color);"></i>',
+                '<i class="fas fa-table" style="font-size: 24px; color: var(--secondary-color);"></i>',
+                '<i class="fas fa-key" style="font-size: 24px; color: var(--primary-color);"></i>',
+                '<i class="fas fa-server" style="font-size: 24px; color: var(--secondary-color);"></i>'
+            ];
+            
+            for (let i = 0; i < 8; i++) {
+                const dbIcon = document.createElement('div');
+                dbIcon.className = 'database-icon';
+                dbIcon.innerHTML = dbIcons[i % dbIcons.length];
+                dbIcon.style.left = `${10 + Math.random() * 80}vw`;
+                dbIcon.style.top = `${10 + Math.random() * 80}vh`;
+                dbIcon.style.animationDelay = `${i * 1.5}s`;
+                backgroundAnimation.appendChild(dbIcon);
+            }
+            
+            // Create binary streams (like Matrix code rain)
+            for (let i = 0; i < 15; i++) {
+                const binaryStream = document.createElement('div');
+                binaryStream.className = 'binary-stream';
+                
+                // Create random binary/SQL-like string
+                let chars = ["0", "1", "S", "Q", "L", "D", "B"];
+                let binaryString = '';
+                for (let j = 0; j < 15; j++) {
+                    binaryString += chars[Math.floor(Math.random() * chars.length)];
+                }
+                binaryStream.textContent = binaryString;
+                
+                // Set random position and animation
+                binaryStream.style.left = `${Math.random() * 100}vw`;
+                binaryStream.style.animationDuration = `${5 + Math.random() * 15}s`;
+                binaryStream.style.animationDelay = `${Math.random() * 5}s`;
+                
+                backgroundAnimation.appendChild(binaryStream);
+            }
+        }
+        
+        // Initialize the background animations
+        createBackgroundElements();
+        
+        // Chat functionality
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const chatMessages = document.getElementById('chatMessages');
+        const chips = document.querySelectorAll('.chip');
+        
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message === '') return;
+            
+            // Add user message
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.className = 'message user-message';
+            userMessageDiv.textContent = message;
+            chatMessages.appendChild(userMessageDiv);
+            
+            // Clear input
+            messageInput.value = '';
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing-indicator';
+            for (let i = 0; i < 3; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'typing-dot';
+                typingIndicator.appendChild(dot);
+            }
+            chatMessages.appendChild(typingIndicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Simulate bot response after delay
+            setTimeout(() => {
+                // Remove typing indicator
+                chatMessages.removeChild(typingIndicator);
+                
+                // Add bot response
+                const botResponseDiv = document.createElement('div');
+                botResponseDiv.className = 'message bot-message';
+                
+                // Sample DBMS responses based on keywords
+                const dbmsResponses = [
+                    "SQL (Structured Query Language) is a standard language for managing relational databases. The most common operations are SELECT, INSERT, UPDATE, and DELETE.",
+                    "Database normalization is the process of structuring a database to reduce data redundancy and improve data integrity. The common normal forms are 1NF, 2NF, 3NF, BCNF, and 4NF.",
+                    "Indexing in databases improves query performance by creating data structures that allow for faster retrieval of records. Common types include B-tree, Hash, and Bitmap indexes.",
+                    "ACID properties (Atomicity, Consistency, Isolation, Durability) ensure reliable transaction processing in database systems even in the event of errors or power failures.",
+                    "The relational model organizes data into tables with rows and columns, while NoSQL models include document, key-value, wide-column, and graph databases.",
+                    "Primary keys uniquely identify records in a table, while foreign keys establish relationships between tables by referencing primary keys in other tables."
+                ];
+                
+                botResponseDiv.textContent = dbmsResponses[Math.floor(Math.random() * dbmsResponses.length)];
+                chatMessages.appendChild(botResponseDiv);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1500);
+        }
+        
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        chips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                messageInput.value = chip.textContent;
+                messageInput.focus();
+            });
+        });
+    </script>
+</body>
+</html>

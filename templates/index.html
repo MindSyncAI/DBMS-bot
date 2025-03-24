@@ -677,31 +677,42 @@
             chatMessages.appendChild(typingIndicator);
             chatMessages.scrollTop = chatMessages.scrollHeight;
             
-            // Simulate bot response after delay
-            setTimeout(() => {
+            // Send message to backend
+            fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
                 // Remove typing indicator
                 chatMessages.removeChild(typingIndicator);
                 
                 // Add bot response
                 const botResponseDiv = document.createElement('div');
                 botResponseDiv.className = 'message bot-message';
-                
-                // Sample DBMS responses based on keywords
-                const dbmsResponses = [
-                    "SQL (Structured Query Language) is a standard language for managing relational databases. The most common operations are SELECT, INSERT, UPDATE, and DELETE.",
-                    "Database normalization is the process of structuring a database to reduce data redundancy and improve data integrity. The common normal forms are 1NF, 2NF, 3NF, BCNF, and 4NF.",
-                    "Indexing in databases improves query performance by creating data structures that allow for faster retrieval of records. Common types include B-tree, Hash, and Bitmap indexes.",
-                    "ACID properties (Atomicity, Consistency, Isolation, Durability) ensure reliable transaction processing in database systems even in the event of errors or power failures.",
-                    "The relational model organizes data into tables with rows and columns, while NoSQL models include document, key-value, wide-column, and graph databases.",
-                    "Primary keys uniquely identify records in a table, while foreign keys establish relationships between tables by referencing primary keys in other tables."
-                ];
-                
-                botResponseDiv.textContent = dbmsResponses[Math.floor(Math.random() * dbmsResponses.length)];
+                botResponseDiv.textContent = data.answer;
                 chatMessages.appendChild(botResponseDiv);
                 
                 // Scroll to bottom
                 chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 1500);
+            })
+            .catch(error => {
+                // Remove typing indicator
+                chatMessages.removeChild(typingIndicator);
+                
+                // Add error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'message bot-message';
+                errorDiv.textContent = 'Sorry, I encountered an error. Please try again.';
+                chatMessages.appendChild(errorDiv);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                console.error('Error:', error);
+            });
         }
         
         // Event listeners

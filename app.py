@@ -46,7 +46,11 @@ def initialize_chain():
     )
     
     # Initialize memory
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    memory = ConversationBufferMemory(
+        memory_key="chat_history",
+        return_messages=True,
+        output_key="answer"  # Explicitly set the output key
+    )
     
     # Create conversation chain
     custom_template = """You are a helpful AI assistant specializing in Computer Organization and Architecture. Use the following pieces of context and your general knowledge to answer the question. If the context doesn't contain relevant information, rely on your general knowledge to provide an accurate response.
@@ -102,8 +106,8 @@ def ask():
     if not user_message:
         return jsonify({'answer': 'Please ask a question'})
     
-    # Get response from the chain
-    result = conversation_chain({"question": user_message, "chat_history": conversation_history})
+    # Get response from the chain using invoke instead of __call__
+    result = conversation_chain.invoke({"question": user_message, "chat_history": conversation_history})
     answer = result["answer"]
     
     # Update conversation history

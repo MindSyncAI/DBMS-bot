@@ -7,6 +7,7 @@ from langchain.memory import ConversationBufferMemory
 import os
 from dotenv import load_dotenv
 import pickle
+from langchain.prompts import PromptTemplate
 
 # Load environment variables
 load_dotenv()
@@ -68,12 +69,17 @@ Please format your response using proper markdown:
 
 Answer: """
 
+    prompt = PromptTemplate(
+        template=custom_template,
+        input_variables=["context", "chat_history", "question"]
+    )
+
     chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
         chain_type='stuff',
         retriever=vector_store.as_retriever(search_kwargs={"k": 2}),
         memory=memory,
-        combine_docs_chain_kwargs={"prompt": custom_template},
+        combine_docs_chain_kwargs={"prompt": prompt},
         return_source_documents=True
     )
     
